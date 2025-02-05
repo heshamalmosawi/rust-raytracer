@@ -1,6 +1,5 @@
 use crate::{
-    color::Color,
-    vec3::{self, Point3, Vec3},
+    color::Color, hittable::{HitRecord, Hittable}, util, vec3::{self, Point3, Vec3}
 };
 
 #[derive(Default)]
@@ -31,7 +30,11 @@ impl Ray {
         It does this by getting unit vector and normalizing it from range (-1, 1) to (0, 1), and applying it to the linear blend of white/blue.
         `blendedValue` = (1 - t) * startValue + t * endValue
     */
-    pub fn get_ray_collor(&self) -> Color {
+    pub fn get_ray_collor(&self, world: &dyn Hittable) -> Color {
+        let mut rec = HitRecord::new();
+        if world.hit(self, 0.0, util::INFINITY, &mut rec){
+            return 0.5 * (rec.normal_surface + Color::new(1.0, 1.0, 1.0)); 
+        }
         let t: f64 = self.hits_sphere(Point3::new(0.0, 0.0, -1.0), 0.5);
         if t > 0.0 {
             let n = vec3::unit_vector(self.at(t) - Vec3::new(0.0, 0.0, -1.0));
