@@ -1,5 +1,5 @@
 use crate::{
-    color::Color, hittable::{HitRecord, Hittable}, util, vec3::{self, Point3, Vec3}
+    color::Color, geometry::vec3::{self, Point3, Vec3}, hittable::hittable::{HitRecord, Hittable}, util
 };
 
 #[derive(Default)]

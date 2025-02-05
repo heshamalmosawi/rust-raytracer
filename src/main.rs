@@ -1,8 +1,6 @@
 use std::io;
 
-use rust_raytracer::{
-    color::{self}, hittable_list::HittableList, ray::Ray, shapes::sphere::Sphere, util::{ASPECT_RATIO, IMAGE_HEIGHT, IMAGE_WIDTH}, vec3::{Point3, Vec3}
-};
+use rust_raytracer::{color, geometry::{ray::Ray, vec3::{Point3, Vec3}}, hittable::hittable_list::HittableList, shapes::sphere::Sphere, util::{ASPECT_RATIO, IMAGE_HEIGHT, IMAGE_WIDTH}};
 
 fn main() {
     print!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);

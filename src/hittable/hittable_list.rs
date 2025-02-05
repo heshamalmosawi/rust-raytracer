@@ -1,5 +1,6 @@
-use crate::hittable::{HitRecord, Hittable};
-use crate::ray::Ray;
+use crate::geometry::ray::Ray;
+
+use super::hittable::{HitRecord, Hittable};
 
 #[derive(Default)]
 pub struct HittableList {
