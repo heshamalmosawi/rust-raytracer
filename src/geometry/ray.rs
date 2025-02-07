@@ -1,5 +1,8 @@
 use crate::{
-    color::Color, geometry::vec3::{self, Point3, Vec3}, hittable::hittable::{HitRecord, Hittable}, util
+    color::Color,
+    geometry::vec3::{self, Point3, Vec3},
+    hittable::hittable::{HitRecord, Hittable},
+    util,
 };
 
 #[derive(Default)]
@@ -30,16 +33,23 @@ impl Ray {
         It does this by getting unit vector and normalizing it from range (-1, 1) to (0, 1), and applying it to the linear blend of white/blue.
         `blendedValue` = (1 - t) * startValue + t * endValue
     */
-    pub fn get_ray_collor(&self, world: &dyn Hittable) -> Color {
+    pub fn get_ray_collor(&self, world: &dyn Hittable, depth: i32) -> Color {
+        if depth <= 0 {
+            return Color::new(0.0, 0.0, 0.0);
+        }
+
         let mut rec = HitRecord::new();
-        if world.hit(self, 0.0, util::INFINITY, &mut rec){
-            return 0.5 * (rec.normal_surface + Color::new(1.0, 1.0, 1.0)); 
+        if world.hit(self, 0.001, util::INFINITY, &mut rec) {
+            let mut attenuation = Color::default();
+            let mut scattered = Ray::default();
+
+            if rec.material.as_ref().unwrap().scatter(self, &rec, &mut attenuation, &mut scattered){
+                return attenuation * scattered.get_ray_collor(world, depth - 1);
+            }
+
+            return Color::new(0.0, 0.0, 0.0);
         }
-        let t: f64 = self.hits_sphere(Point3::new(0.0, 0.0, -1.0), 0.5);
-        if t > 0.0 {
-            let n = vec3::unit_vector(self.at(t) - Vec3::new(0.0, 0.0, -1.0));
-            return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
-        }
+
         let unit_direction = vec3::unit_vector(self.get_direction());
         let t: f64 = 0.5 * (unit_direction.y() + 1.0);
         (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)

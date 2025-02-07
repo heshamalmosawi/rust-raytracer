@@ -11,11 +11,11 @@ pub fn write_color(out: &mut impl Write, pixel_color: Color) {
     let mut b = pixel_color.z();
     let mut g = pixel_color.y();
 
-    // divide color by number of samples to for accumlation of light
+    // divide color by number of samples to for accumlation of light and gamma-correct for gamma=2.0
     let scale = 1.0 / SAMPLES_PER_PIXEL as f64;
-    r *= scale;
-    g *= scale;
-    b *= scale;
+    r = f64::sqrt(scale * r);
+    g = f64::sqrt(scale * g);
+    b = f64::sqrt(scale * b);
 
     writeln!(
         out,

@@ -1,20 +1,46 @@
-use std::io;
+use std::{io, rc::Rc};
 
 use rust_raytracer::{
     camera::Camera,
     color::{self, Color},
     geometry::vec3::Point3,
     hittable::hittable_list::HittableList,
+    material::{Lambertian, Metal},
     shapes::sphere::Sphere,
     util::{random_double, IMAGE_HEIGHT, IMAGE_WIDTH, SAMPLES_PER_PIXEL},
 };
 
 fn main() {
-    print!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
+    const MAX_DEPTH: i32 = 50;
 
+    print!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5))); // ???????????????
-    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.3));
+
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
+    )));
 
     let cam = Camera::new();
 
@@ -26,7 +52,7 @@ fn main() {
                 let u = (i as f64 + random_double()) / (IMAGE_WIDTH - 1) as f64;
                 let v = (j as f64 + random_double()) / (IMAGE_HEIGHT - 1) as f64;
                 let r = cam.get_ray(u, v);
-                pixel_color += r.get_ray_collor(&world);
+                pixel_color += r.get_ray_collor(&world, MAX_DEPTH);
             }
             color::write_color(&mut io::stdout(), pixel_color);
         }
