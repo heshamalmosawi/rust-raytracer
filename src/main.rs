@@ -3,7 +3,7 @@ use std::{io, rc::Rc};
 use rust_raytracer::{
     camera::Camera,
     color::{self, Color},
-    geometry::vec3::Point3,
+    geometry::vec3::{Point3, Vec3},
     hittable::hittable_list::HittableList,
     material::{Dielectric, Lambertian, Metal},
     shapes::sphere::Sphere,
@@ -14,6 +14,8 @@ fn main() {
     const MAX_DEPTH: i32 = 50;
 
     print!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
+
+    // let r = (util::PI / 4.0).cos();
     let mut world = HittableList::new();
 
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
@@ -33,7 +35,12 @@ fn main() {
     )));
     world.add(Box::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
-        -0.4,
+        0.5,
+        material_left.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        -0.45,
         material_left,
     )));
     world.add(Box::new(Sphere::new(
@@ -42,7 +49,12 @@ fn main() {
         material_right,
     )));
 
-    let cam = Camera::new();
+    let cam = Camera::new(
+        Point3::new(-2.0, 2.0, 1.0),
+        Point3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        20.0,
+    );
 
     for j in (0..IMAGE_HEIGHT).rev() {
         eprint!("\rScanlines remaining: {} ", j);
