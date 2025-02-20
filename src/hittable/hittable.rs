@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::geometry::ray::Ray;
 use crate::geometry::vec3::{self, Point3, Vec3};
@@ -8,7 +8,7 @@ use crate::material::Material;
 pub struct HitRecord {
     pub p: Point3, // point of intersection
     pub normal_surface: Vec3, // normal to the surface at the point of intersection
-    pub material: Option<Rc<dyn Material>>, // Material of object
+    pub material: Option<Arc<dyn Material>>, // Material of object
     pub t: f64, // time of intersection
     pub hits_front: bool, // whether the ray is hitting the front or back face of the surface
 }
@@ -31,6 +31,6 @@ impl HitRecord {
     }
 }
 
-pub trait Hittable {
+pub trait Hittable: Send + Sync {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 }

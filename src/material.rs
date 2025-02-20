@@ -8,7 +8,7 @@ use crate::{
     util::random_double,
 };
 
-pub trait Material {
+pub trait Material: Send + Sync {
     fn scatter(
         &self,
         r_in: &Ray,
